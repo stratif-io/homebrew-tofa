@@ -1,0 +1,38 @@
+name: Update Formula
+
+on:
+  repository_dispatch:
+    types: [new-release]
+
+jobs:
+  update:
+    name: Update tofa formula
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Formula/tofa.rb
+        env:
+          VERSION: ${{ github.event.client_payload.version }}
+          SHA_MAC_ARM: ${{ github.event.client_payload.sha_mac_arm }}
+          SHA_MAC_X86: ${{ github.event.client_payload.sha_mac_x86 }}
+          SHA_LINUX_ARM: ${{ github.event.client_payload.sha_linux_arm }}
+          SHA_LINUX_X86: ${{ github.event.client_payload.sha_linux_x86 }}
+        run: |
+          sed -i \
+            -e "s|version \".*\" # VERSION|version \"${VERSION}\" # VERSION|" \
+            -e "s|sha256 \".*\" # SHA_MAC_ARM|sha256 \"${SHA_MAC_ARM}\" # SHA_MAC_ARM|" \
+            -e "s|sha256 \".*\" # SHA_MAC_X86|sha256 \"${SHA_MAC_X86}\" # SHA_MAC_X86|" \
+            -e "s|sha256 \".*\" # SHA_LINUX_ARM|sha256 \"${SHA_LINUX_ARM}\" # SHA_LINUX_ARM|" \
+            -e "s|sha256 \".*\" # SHA_LINUX_X86|sha256 \"${SHA_LINUX_X86}\" # SHA_LINUX_X86|" \
+            Formula/tofa.rb
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/tofa.rb
+          git commit -m "feat: update tofa to v${{ github.event.client_payload.version }}"
+          git push
