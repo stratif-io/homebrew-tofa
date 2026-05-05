@@ -1,6 +1,6 @@
 cask "tofa" do
-  version "0.5.3" # VERSION
-  sha256 "e10bc02c4ad50ef267ccb7dcd0f3f6fc5df1ad90bdb232aa0cd5392387f34fc9" # SHA_DMG
+  version "0.6.0" # VERSION
+  sha256 "d1a2fb5725b0f90b579a692fff438f72fa15f4fd4f8a704db1d02d553adc3649" # SHA_DMG
 
   url "https://github.com/stratif-io/tofa/releases/download/tofa-macos-v#{version}/tofa-app-#{version}.dmg"
 
