@@ -1,5 +1,5 @@
 class Tofa < Formula
-  desc "Eye-candy terminal OTP manager"
+  desc "Offline, encrypted 2FA — CLI and TUI"
   homepage "https://github.com/stratif-io/tofa"
   version "PLACEHOLDER_VERSION" # VERSION
   license "MIT"

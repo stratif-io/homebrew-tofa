@@ -2,41 +2,68 @@ name: Update tap
 
 on:
   repository_dispatch:
-    types: [new-release]
+    types: [new-cli-release, new-app-release]
+
+permissions:
+  contents: write
 
 jobs:
-  update:
+  update-formula:
+    name: Update CLI formula
+    if: github.event.action == 'new-cli-release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update formula and cask
+      - name: Patch Formula/tofa.rb
+        env:
+          VERSION: ${{ github.event.client_payload.version }}
+          SHA_MAC_ARM: ${{ github.event.client_payload.sha_mac_arm }}
+          SHA_MAC_X86: ${{ github.event.client_payload.sha_mac_x86 }}
+          SHA_LINUX_ARM: ${{ github.event.client_payload.sha_linux_arm }}
+          SHA_LINUX_X86: ${{ github.event.client_payload.sha_linux_x86 }}
         run: |
-          VERSION="${{ github.event.client_payload.version }}"
-          SHA_MAC_ARM="${{ github.event.client_payload.sha_mac_arm }}"
-          SHA_MAC_X86="${{ github.event.client_payload.sha_mac_x86 }}"
-          SHA_LINUX_ARM="${{ github.event.client_payload.sha_linux_arm }}"
-          SHA_LINUX_X86="${{ github.event.client_payload.sha_linux_x86 }}"
-          SHA_DMG="${{ github.event.client_payload.sha_dmg }}"
-
-          # Formula — replace values on lines containing the named markers
-          sed -i "s/\"[^\"]*\" # VERSION/\"$VERSION\" # VERSION/" Formula/tofa.rb
-          sed -i "s/\"[^\"]*\" # SHA_MAC_ARM/\"$SHA_MAC_ARM\" # SHA_MAC_ARM/" Formula/tofa.rb
-          sed -i "s/\"[^\"]*\" # SHA_MAC_X86/\"$SHA_MAC_X86\" # SHA_MAC_X86/" Formula/tofa.rb
-          sed -i "s/\"[^\"]*\" # SHA_LINUX_ARM/\"$SHA_LINUX_ARM\" # SHA_LINUX_ARM/" Formula/tofa.rb
-          sed -i "s/\"[^\"]*\" # SHA_LINUX_X86/\"$SHA_LINUX_X86\" # SHA_LINUX_X86/" Formula/tofa.rb
-
-          # Cask
-          sed -i "s/\"[^\"]*\" # VERSION/\"$VERSION\" # VERSION/" Casks/tofa.rb
-          sed -i "s/\"[^\"]*\" # SHA_DMG/\"$SHA_DMG\" # SHA_DMG/" Casks/tofa.rb
+          sed -i \
+            -e "s/\"[^\"]*\" # VERSION/\"$VERSION\" # VERSION/" \
+            -e "s/\"[^\"]*\" # SHA_MAC_ARM/\"$SHA_MAC_ARM\" # SHA_MAC_ARM/" \
+            -e "s/\"[^\"]*\" # SHA_MAC_X86/\"$SHA_MAC_X86\" # SHA_MAC_X86/" \
+            -e "s/\"[^\"]*\" # SHA_LINUX_ARM/\"$SHA_LINUX_ARM\" # SHA_LINUX_ARM/" \
+            -e "s/\"[^\"]*\" # SHA_LINUX_X86/\"$SHA_LINUX_X86\" # SHA_LINUX_X86/" \
+            Formula/tofa.rb
 
       - name: Commit and push
         run: |
-          VERSION="${{ github.event.client_payload.version }}"
-          git config user.name "github-actions[bot]"
+          git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Formula/tofa.rb Casks/tofa.rb
-          git diff --staged --quiet || git commit -m "chore: update to v$VERSION"
+          git add Formula/tofa.rb
+          git diff --staged --quiet || git commit -m "chore: update tofa formula to v${{ github.event.client_payload.version }}"
+          git push
+
+  update-cask:
+    name: Update app cask
+    if: github.event.action == 'new-app-release'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Patch Casks/tofa.rb
+        env:
+          VERSION: ${{ github.event.client_payload.version }}
+          SHA_DMG: ${{ github.event.client_payload.sha_dmg }}
+        run: |
+          sed -i \
+            -e "s/\"[^\"]*\" # VERSION/\"$VERSION\" # VERSION/" \
+            -e "s/\"[^\"]*\" # SHA_DMG/\"$SHA_DMG\" # SHA_DMG/" \
+            Casks/tofa.rb
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Casks/tofa.rb
+          git diff --staged --quiet || git commit -m "chore: update tofa cask to v${{ github.event.client_payload.version }}"
           git push
