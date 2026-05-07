@@ -1,28 +1,28 @@
 class Tofa < Formula
   desc "Offline, encrypted 2FA — CLI and TUI"
   homepage "https://github.com/stratif-io/tofa"
-  version "0.6.0" # VERSION
+  version "0.8.0" # VERSION
   license "MIT"
 
   on_macos do
     on_arm do
       url "https://github.com/stratif-io/tofa/releases/download/v#{version}/tofa-#{version}-aarch64-apple-darwin.tar.gz"
-      sha256 "a84eaeb33cf7582cc0bbcacc3e4354feec93139b5fa4cba67dd803ed46faa1b1" # SHA_MAC_ARM
+      sha256 "5058c8240550fbda2bd19bdaaa8696a746cc275a79fc6ccd3bc8181f15351c22" # SHA_MAC_ARM
     end
     on_intel do
       url "https://github.com/stratif-io/tofa/releases/download/v#{version}/tofa-#{version}-x86_64-apple-darwin.tar.gz"
-      sha256 "c28eefe05ba2a6b1e64846e3d65ede19cc8857bfb503303a61378390d10ea917" # SHA_MAC_X86
+      sha256 "a2e98291225d59c0e4040c33625623fe80d8c3323e36f850fa692891be3cbcfb" # SHA_MAC_X86
     end
   end
 
   on_linux do
     on_arm do
       url "https://github.com/stratif-io/tofa/releases/download/v#{version}/tofa-#{version}-aarch64-unknown-linux-musl.tar.gz"
-      sha256 "e1ece81085d4e52e7f36770f00596cf0e6c888aca158ec93a2cba910977d3918" # SHA_LINUX_ARM
+      sha256 "d7a2f938568e30efd9ef63130c6576add8eb077b6260568dcb4765fffe05c606" # SHA_LINUX_ARM
     end
     on_intel do
       url "https://github.com/stratif-io/tofa/releases/download/v#{version}/tofa-#{version}-x86_64-unknown-linux-musl.tar.gz"
-      sha256 "25539b1e7c370c991964c891c3b11978aeb50e1e66c64fd576b89cf45778e571" # SHA_LINUX_X86
+      sha256 "d0521fb7e4e4180f54ccda9674e7cfde48f2fac135889d21a4e3285168cd96b0" # SHA_LINUX_X86
     end
   end
 
